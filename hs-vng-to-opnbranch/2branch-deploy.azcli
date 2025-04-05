@@ -69,7 +69,7 @@ existingTrustedSubnetName="trusted"
 az network vnet subnet create -g $rg --vnet-name $virtualNetworkName --name $existingUntrustedSubnetName \
   --address-prefixes $UntrustedSubnetCIDR --output none
 az network vnet subnet create -g $rg --vnet-name $virtualNetworkName --name $existingTrustedSubnetName \
-  --address-prefixes $TrustedSubnetCIDR --output none"$
+  --address-prefixes $TrustedSubnetCIDR --output none
 
 # Deploy OPNsense VM
 echo "Deploying OPNsense NVA on $branchname"
