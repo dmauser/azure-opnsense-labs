@@ -23,6 +23,10 @@ if [ -z "$password" ]; then
   done
 fi
 
+# Record script start time
+start_time=$(date +%s)
+echo "Script started at $(date)"
+
 # Wait for the resource group to exist
 while true; do
   if [ "$(az group exists --name $rg)" = "true" ]; then
@@ -96,19 +100,16 @@ done
 
 # Create and configure NSG for NVA subnet
 echo "Creating NSG and associating it to NVA Subnet"
-az network nsg create --resource-group $rg --name "$branchname-nva-nsg" --location $location -o none
-az network nsg rule create -g $rg --nsg-name branchname-nva-nsg" -n "default-allow-ssh" \
-  --direction Inbound --priority 300 --source-address-prefixes $mypip --destination-port-ranges 443 \
-  --access Allow --protocol Tcp --description "Allow inbound HTTPS" --output none
-az network nsg rule create -g $rg --nsg-name "$branchname-nva-nsg" -n "allow-rfc1918-in" \
-  --direction Inbound --priority 310 --source-address-prefixes "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16" \
-  --destination-address-prefixes "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16" --access Allow --protocol "*" --output none
-az network vnet subnet update -g $rg --name "trusted" --vnet-name "$branchname-vnet" \
-  --network-security-group "$branchname-nva-nsg" -o none
+echo Creating NSG and associate to NVA Subnet
+az network nsg create --resource-group $rg --name $branchname-nva-nsg --location $location -o none
+az network nsg rule create -g $rg --nsg-name $branchname-nva-nsg -n 'allow-https' --direction Inbound --priority 300 --source-address-prefixes $mypip --source-port-ranges '*' --destination-address-prefixes '*' --destination-port-ranges 443 --access Allow --protocol Tcp --description "Allow inbound HTTPs" --output none
+az network nsg rule create -g $rg --nsg-name $branchname-nva-nsg -n 'allow-rfc1918-in' --direction Inbound --priority 310 --source-address-prefixes  10.0.0.0/8 172.16.0.0/12 192.168.0.0/16  --source-port-ranges '*' --destination-address-prefixes  10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 --destination-port-ranges '*' --access Allow --protocol '*' --description "allow-rfc1918-in" --output none
+az network nsg rule create -g $rg --nsg-name $branchname-nva-nsg -n 'allow-rfc1918-out' --direction outbound --priority 320 --source-address-prefixes 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 --source-port-ranges '*' --destination-address-prefixes 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 --destination-port-ranges '*' --access Allow --protocol '*' --description "allow-rfc1918-out" --output none
+az network vnet subnet update -g $rg --name trusted --vnet-name $branchname-vnet --network-security-group $branchname-nva-nsg -o none
 
 # Add UDP 500 and 4500 rules to the default NSG
 az network nsg rule create -g $rg --nsg-name "$branchname-nva-nsg" -n "allow-udp500" \
-  --priority 320 --destination-port-ranges 500 --direction Inbound --access Allow --protocol Udp -o none
+  --priority 330 --destination-port-ranges 500 --direction Inbound --access Allow --protocol Udp -o none
 az network nsg rule create -g $rg --nsg-name "$branchname-nva-nsg" -n "allow-udp4500" \
   --priority 340 --destination-port-ranges 4500 --direction Inbound --access Allow --protocol Udp -o none
 
@@ -117,7 +118,7 @@ fs1nvaip=$(az network nic show --name "$branchname-opnnva-Trusted-NIC" --resourc
   --query "ipConfigurations[0].privateIPAddress" -o tsv)
 az network route-table create -g $rg --name "$branchname-UDR" -l $location -o none
 az network route-table route create -g $rg --route-table-name "$branchname-UDR" --name "$branchname-UDR" \
-  --address-prefix "192.168.0.0/16" --next-hop-type VirtualAppliance --next-hop-ip-address $fs1nvaip -o none
+  --address-prefix "10.0.0.0/8" --next-hop-type VirtualAppliance --next-hop-ip-address $fs1nvaip -o none
 az network vnet subnet update -g $rg -n "vm-subnet" --vnet-name "$branchname-vnet" \
   --route-table "$branchname-UDR" -o none
 
@@ -143,3 +144,10 @@ echo "Enabling boot diagnostics for all VMs"
 az vm boot-diagnostics enable --ids $(az vm list -g $rg --query "[].id" -o tsv) -o none
 
 echo "Deployment has finished."
+
+# Add script ending time but hours, minutes and seconds
+end=`date +%s`
+runtime=$((end-start))
+echo "Script finished at $(date)"
+echo "Total script execution time: $(($runtime / 3600)) hours $((($runtime / 60) % 60)) minutes and $(($runtime % 60)) seconds."
+
