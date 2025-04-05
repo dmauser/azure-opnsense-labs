@@ -2,6 +2,19 @@
 rg="lab-vng-opn" # Define your resource group
 location=$(az group show -n $rg --query location -o tsv) # Set location
 mypip=$(curl -4 ifconfig.io -s) # Captures your local Public IP for NSG rules
+branchname="branch1" 
+
+# Deploy OPNsense NVA
+ShellScriptName="configureopnsense.sh"
+scenarioOption="TwoNics"
+virtualMachineSize="Standard_DS1_v2"
+virtualMachineName="$branchname-opnnva"
+virtualNetworkName="$branchname-vnet"
+VNETAddress="192.168.100.0/24"
+UntrustedSubnetCIDR="192.168.100.64/28"
+TrustedSubnetCIDR="192.168.100.80/28"
+existingUntrustedSubnetName="untrusted"
+existingTrustedSubnetName="trusted"
 
 # Check if username and password are already defined, otherwise prompt for them
 if [ -z "$username" ]; then
@@ -38,12 +51,6 @@ while true; do
   fi
 done
 
-# Branch and BGP settings
-branchname="branch1" # Target NET
-local_asn=65100 # Local ASN
-rmt_asn=65515
-bgp_network1="192.168.100.0/24"
-
 # Create NVA VNET and subnet
 az network vnet create --name "$branchname-vnet" --resource-group $rg --location $location \
   --address-prefix "192.168.100.0/24" --subnet-name "vm-subnet" --subnet-prefix "192.168.100.0/28" -o none
@@ -56,18 +63,6 @@ az network vnet subnet update -g $rg -n "vm-subnet" --vnet-name "$branchname-vne
 az vm create -n "$branchname-vm1" -g $rg --image "Ubuntu2204" --public-ip-sku "Standard" \
   --size "Standard_DS1_v2" -l $location --subnet "vm-subnet" --vnet-name "$branchname-vnet" \
   --admin-username "$username" --admin-password "$password" --nsg "" --no-wait --only-show-errors
-
-# Deploy OPNsense NVA
-ShellScriptName="configureopnsense.sh"
-scenarioOption="TwoNics"
-virtualMachineSize="Standard_DS1_v2"
-virtualMachineName="$branchname-opnnva"
-virtualNetworkName="$branchname-vnet"
-VNETAddress="192.168.100.0/24"
-UntrustedSubnetCIDR="192.168.100.64/28"
-TrustedSubnetCIDR="192.168.100.80/28"
-existingUntrustedSubnetName="untrusted"
-existingTrustedSubnetName="trusted"
 
 # Create untrusted and trusted subnets
 az network vnet subnet create -g $rg --vnet-name $virtualNetworkName --name $existingUntrustedSubnetName \
@@ -88,19 +83,11 @@ az deployment group create --name "$branchname-nva-$RANDOM" --resource-group $rg
   Location=$location --no-wait
 
 # Wait for Trusted NIC to exist
-while true; do
-  if az network nic show --name "$branchname-opnnva-Trusted-NIC" --resource-group $rg --query id -o tsv; then
-    echo "NIC $branchname-opnnva-Trusted-NIC exists."
-    break
-  else
-    echo "NIC $branchname-opnnva-Trusted-NIC does not exist. Waiting for 15 seconds..."
-    sleep 15
-  fi
-done
+echo "Waiting for OPNSense trusted NIC to exist..."
+az network nic wait --name "$branchname-opnnva-Trusted-NIC" --resource-group $rg --created
 
 # Create and configure NSG for NVA subnet
 echo "Creating NSG and associating it to NVA Subnet"
-echo Creating NSG and associate to NVA Subnet
 az network nsg create --resource-group $rg --name $branchname-nva-nsg --location $location -o none
 az network nsg rule create -g $rg --nsg-name $branchname-nva-nsg -n 'allow-https' --direction Inbound --priority 300 --source-address-prefixes $mypip --source-port-ranges '*' --destination-address-prefixes '*' --destination-port-ranges 443 --access Allow --protocol Tcp --description "Allow inbound HTTPs" --output none
 az network nsg rule create -g $rg --nsg-name $branchname-nva-nsg -n 'allow-rfc1918-in' --direction Inbound --priority 310 --source-address-prefixes  10.0.0.0/8 172.16.0.0/12 192.168.0.0/16  --source-port-ranges '*' --destination-address-prefixes  10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 --destination-port-ranges '*' --access Allow --protocol '*' --description "allow-rfc1918-in" --output none
@@ -141,7 +128,7 @@ done
 
 # Enable boot diagnostics for all VMs
 echo "Enabling boot diagnostics for all VMs"
-az vm boot-diagnostics enable --ids $(az vm list -g $rg --query "[].id" -o tsv) -o none
+az vm boot-diagnostics enable --ids $(az vm list -g $rg --query "[?contains(name, '$branchname')].id" -o tsv) -o none
 
 echo "Deployment has finished."
 
@@ -150,4 +137,3 @@ end=`date +%s`
 runtime=$((end-start))
 echo "Script finished at $(date)"
 echo "Total script execution time: $(($runtime / 3600)) hours $((($runtime / 60) % 60)) minutes and $(($runtime % 60)) seconds."
-
