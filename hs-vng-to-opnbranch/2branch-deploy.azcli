@@ -88,17 +88,87 @@ az network nic wait --name "$branchname-opnnva-Trusted-NIC" --resource-group $rg
 
 # Create and configure NSG for NVA subnet
 echo "Creating NSG and associating it to NVA Subnet"
-az network nsg create --resource-group $rg --name $branchname-nva-nsg --location $location -o none
-az network nsg rule create -g $rg --nsg-name $branchname-nva-nsg -n 'allow-https' --direction Inbound --priority 300 --source-address-prefixes $mypip --source-port-ranges '*' --destination-address-prefixes '*' --destination-port-ranges 443 --access Allow --protocol Tcp --description "Allow inbound HTTPs" --output none
-az network nsg rule create -g $rg --nsg-name $branchname-nva-nsg -n 'allow-rfc1918-in' --direction Inbound --priority 310 --source-address-prefixes  10.0.0.0/8 172.16.0.0/12 192.168.0.0/16  --source-port-ranges '*' --destination-address-prefixes  10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 --destination-port-ranges '*' --access Allow --protocol '*' --description "allow-rfc1918-in" --output none
-az network nsg rule create -g $rg --nsg-name $branchname-nva-nsg -n 'allow-rfc1918-out' --direction outbound --priority 320 --source-address-prefixes 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 --source-port-ranges '*' --destination-address-prefixes 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 --destination-port-ranges '*' --access Allow --protocol '*' --description "allow-rfc1918-out" --output none
-az network vnet subnet update -g $rg --name trusted --vnet-name $branchname-vnet --network-security-group $branchname-nva-nsg -o none
+
+az network nsg create \
+  --resource-group $rg \
+  --name $branchname-nva-nsg \
+  --location $location \
+  -o none
+
+az network nsg rule create \
+  -g $rg \
+  --nsg-name $branchname-nva-nsg \
+  -n 'allow-https' \
+  --direction Inbound \
+  --priority 300 \
+  --source-address-prefixes $mypip \
+  --source-port-ranges '*' \
+  --destination-address-prefixes '*' \
+  --destination-port-ranges 443 \
+  --access Allow \
+  --protocol Tcp \
+  --description "Allow inbound HTTPs" \
+  --output none
+
+az network nsg rule create \
+  -g $rg \
+  --nsg-name $branchname-nva-nsg \
+  -n 'allow-rfc1918-in' \
+  --direction Inbound \
+  --priority 310 \
+  --source-address-prefixes 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 \
+  --source-port-ranges '*' \
+  --destination-address-prefixes 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 \
+  --destination-port-ranges '*' \
+  --access Allow \
+  --protocol '*' \
+  --description "allow-rfc1918-in" \
+  --output none
+
+az network nsg rule create \
+  -g $rg \
+  --nsg-name $branchname-nva-nsg \
+  -n 'allow-rfc1918-out' \
+  --direction outbound \
+  --priority 320 \
+  --source-address-prefixes 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 \
+  --source-port-ranges '*' \
+  --destination-address-prefixes 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 \
+  --destination-port-ranges '*' \
+  --access Allow \
+  --protocol '*' \
+  --description "allow-rfc1918-out" \
+  --output none
+
+az network vnet subnet update \
+  -g $rg \
+  --name trusted \
+  --vnet-name $branchname-vnet \
+  --network-security-group $branchname-nva-nsg \
+  -o none
 
 # Add UDP 500 and 4500 rules to the default NSG
-az network nsg rule create -g $rg --nsg-name "$branchname-nva-nsg" -n "allow-udp500" \
-  --priority 330 --destination-port-ranges 500 --direction Inbound --access Allow --protocol Udp -o none
-az network nsg rule create -g $rg --nsg-name "$branchname-nva-nsg" -n "allow-udp4500" \
-  --priority 340 --destination-port-ranges 4500 --direction Inbound --access Allow --protocol Udp -o none
+az network nsg rule create \
+  -g $rg \
+  --nsg-name "$branchname-nva-nsg" \
+  -n "allow-udp500" \
+  --priority 330 \
+  --destination-port-ranges 500 \
+  --direction Inbound \
+  --access Allow \
+  --protocol Udp \
+  -o none
+
+az network nsg rule create \
+  -g $rg \
+  --nsg-name "$branchname-nva-nsg" \
+  -n "allow-udp4500" \
+  --priority 340 \
+  --destination-port-ranges 4500 \
+  --direction Inbound \
+  --access Allow \
+  --protocol Udp \
+  -o none
 
 # Create UDR and associate it with the subnet
 fs1nvaip=$(az network nic show --name "$branchname-opnnva-Trusted-NIC" --resource-group $rg \
