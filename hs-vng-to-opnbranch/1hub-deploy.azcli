@@ -74,5 +74,9 @@ done
 # Record script end time
 end_time=$(date +%s)
 echo "Script completed at $(date)"
-echo "Total execution time: $((end_time - start_time)) seconds"
+total_time=$((end_time - start_time))
+hours=$((total_time / 3600))
+minutes=$(((total_time % 3600) / 60))
+seconds=$((total_time % 60))
+echo "Total execution time: ${hours}h ${minutes}m ${seconds}s"
 

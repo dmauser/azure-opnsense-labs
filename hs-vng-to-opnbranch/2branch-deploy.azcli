@@ -3,6 +3,26 @@ rg="lab-vng-opn" # Define your resource group
 location=$(az group show -n $rg --query location -o tsv) # Set location
 mypip=$(curl -4 ifconfig.io -s) # Captures your local Public IP for NSG rules
 
+# Check if username and password are already defined, otherwise prompt for them
+if [ -z "$username" ]; then
+  read -p "Enter your username (default: azureuser): " username
+  username=${username:-azureuser} # Default to azureuser if not provided
+fi
+
+if [ -z "$password" ]; then
+  while true; do
+    read -s -p "Enter your password: " password
+    echo
+    read -s -p "Confirm your password: " password_confirm
+    echo
+    if [ "$password" = "$password_confirm" ]; then
+      break
+    else
+      echo "Passwords do not match. Please try again."
+    fi
+  done
+fi
+
 # Wait for the resource group to exist
 while true; do
   if [ "$(az group exists --name $rg)" = "true" ]; then
@@ -49,7 +69,7 @@ existingTrustedSubnetName="trusted"
 az network vnet subnet create -g $rg --vnet-name $virtualNetworkName --name $existingUntrustedSubnetName \
   --address-prefixes $UntrustedSubnetCIDR --output none
 az network vnet subnet create -g $rg --vnet-name $virtualNetworkName --name $existingTrustedSubnetName \
-  --address-prefixes $TrustedSubnetCIDR --output none
+  --address-prefixes $TrustedSubnetCIDR --output none"$
 
 # Deploy OPNsense VM
 echo "Deploying OPNsense NVA on $branchname"
@@ -77,9 +97,9 @@ done
 # Create and configure NSG for NVA subnet
 echo "Creating NSG and associating it to NVA Subnet"
 az network nsg create --resource-group $rg --name "$branchname-nva-nsg" --location $location -o none
-az network nsg rule create -g $rg --nsg-name "$branchname-nva-nsg" -n "default-allow-ssh" \
-  --direction Inbound --priority 300 --source-address-prefixes $mypip --destination-port-ranges 22 \
-  --access Allow --protocol Tcp --description "Allow inbound SSH" --output none
+az network nsg rule create -g $rg --nsg-name branchname-nva-nsg" -n "default-allow-ssh" \
+  --direction Inbound --priority 300 --source-address-prefixes $mypip --destination-port-ranges 443 \
+  --access Allow --protocol Tcp --description "Allow inbound HTTPS" --output none
 az network nsg rule create -g $rg --nsg-name "$branchname-nva-nsg" -n "allow-rfc1918-in" \
   --direction Inbound --priority 310 --source-address-prefixes "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16" \
   --destination-address-prefixes "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16" --access Allow --protocol "*" --output none
@@ -87,10 +107,10 @@ az network vnet subnet update -g $rg --name "trusted" --vnet-name "$branchname-v
   --network-security-group "$branchname-nva-nsg" -o none
 
 # Add UDP 500 and 4500 rules to the default NSG
-az network nsg rule create -g $rg --nsg-name "$location-default-nsg" -n "allow-udp500" \
-  --priority 100 --destination-port-ranges 500 --direction Inbound --access Allow --protocol Udp -o none
-az network nsg rule create -g $rg --nsg-name "$location-default-nsg" -n "allow-udp4500" \
-  --priority 101 --destination-port-ranges 4500 --direction Inbound --access Allow --protocol Udp -o none
+az network nsg rule create -g $rg --nsg-name "$branchname-nva-nsg" -n "allow-udp500" \
+  --priority 320 --destination-port-ranges 500 --direction Inbound --access Allow --protocol Udp -o none
+az network nsg rule create -g $rg --nsg-name "$branchname-nva-nsg" -n "allow-udp4500" \
+  --priority 340 --destination-port-ranges 4500 --direction Inbound --access Allow --protocol Udp -o none
 
 # Create UDR and associate it with the subnet
 fs1nvaip=$(az network nic show --name "$branchname-opnnva-Trusted-NIC" --resource-group $rg \
@@ -105,9 +125,9 @@ az network vnet subnet update -g $rg -n "vm-subnet" --vnet-name "$branchname-vne
 az network nic update -g $rg -n "$virtualMachineName-Trusted-NIC" --network-security-group null --output none
 az network nic update -g $rg -n "$virtualMachineName-Untrusted-NIC" --network-security-group null --output none
 az network vnet subnet update --name $existingTrustedSubnetName --resource-group $rg \
-  --vnet-name $virtualNetworkName --network-security-group "$location-default-nsg" -o none
+  --vnet-name $virtualNetworkName --network-security-group "$branchname-nva-nsg" -o none
 az network vnet subnet update --name $existingUntrustedSubnetName --resource-group $rg \
-  --vnet-name $virtualNetworkName --network-security-group "$location-default-nsg" -o none
+  --vnet-name $virtualNetworkName --network-security-group "$branchname-nva-nsg" -o none
 
 # Install networking tools on all VMs
 echo "Installing networking tools on VMs"
