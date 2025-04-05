@@ -45,8 +45,8 @@ echo "Deploying Hub and Spoke..."
 az group create --name $rg --location $location -o none
 az deployment group create --name "Hub1-$location" --resource-group $rg \
     --template-uri "https://raw.githubusercontent.com/dmauser/azure-hub-spoke-base-lab/main/azuredeployv6.json" \
-    --parameters "https://raw.githubusercontent.com/dmauser/azure-vnet-encryption/refs/heads/main/parameters.json" \
-    --parameters virtualMachineSize=$vmsize virtualMachinePublicIP=false deployBastion=true \
+    --parameters "https://raw.githubusercontent.com/dmauser/azure-hub-spoke-base-lab/refs/heads/main/parameters.json" \
+    --parameters virtualMachineSize=$vmsize virtualMachinePublicIP=false deployBastion=true deployOnpremisesVPNGateway=false \
     --parameters VmAdminUsername=$username VmAdminPassword=$password \
     --no-wait
 
