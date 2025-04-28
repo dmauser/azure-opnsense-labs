@@ -60,9 +60,10 @@ az network vnet subnet update -g $rg -n "vm-subnet" --vnet-name "$branchname-vne
   --network-security-group "$location-default-nsg" -o none
 
 # Create Ubuntu VM on vm-subnet
-az vm create -n "$branchname-vm1" -g $rg --image "Ubuntu2204" --public-ip-sku "Standard" \
+az vm create -n "$branchname-vm1" -g $rg --image "Ubuntu2204" \
   --size "Standard_DS1_v2" -l $location --subnet "vm-subnet" --vnet-name "$branchname-vnet" \
-  --admin-username "$username" --admin-password "$password" --nsg "" --no-wait --only-show-errors
+  --admin-username "$username" --admin-password "$password" --nsg "" --no-wait --only-show-errors \
+  --public-ip-address ""
 
 # Create untrusted and trusted subnets
 az network vnet subnet create -g $rg --vnet-name $virtualNetworkName --name $existingUntrustedSubnetName \
@@ -204,6 +205,6 @@ echo "Deployment has finished."
 
 # Add script ending time but hours, minutes and seconds
 end=`date +%s`
-runtime=$((end-start))
+runtime=$((end-start_time))
 echo "Script finished at $(date)"
 echo "Total script execution time: $(($runtime / 3600)) hours $((($runtime / 60) % 60)) minutes and $(($runtime % 60)) seconds."

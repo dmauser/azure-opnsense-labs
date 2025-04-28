@@ -74,6 +74,6 @@ echo "Deployment has finished."
 
 # Add script ending time but hours, minutes and seconds
 end=`date +%s`
-runtime=$((end-start))
+runtime=$((end-start_time))
 echo "Script finished at $(date)"
 echo "Total script execution time: $(($runtime / 3600)) hours $((($runtime / 60) % 60)) minutes and $(($runtime % 60)) seconds."

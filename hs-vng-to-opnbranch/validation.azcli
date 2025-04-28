@@ -1,0 +1,25 @@
+# Parameters
+rg="lab-vng-opn"
+
+# List all VMs and their private and public IPs
+az vm list-ip-addresses -g $rg --query "[].{Name:virtualMachine.name, PrivateIP:virtualMachine.network.privateIpAddresses[0], PublicIP:virtualMachine.network.publicIpAddresses[0].ipAddress}" -o table
+
+# For each VM list its name and show effective routes using attached netork interface card name
+for nicname in `az network nic list -g $rg --query [].name -o tsv`
+do 
+echo -e $nicname effective routes:
+az network nic show-effective-route-table -g $rg --name $nicname --output table | grep -E "User|VirtualNetworkGateway"
+echo -e 
+done
+
+# Dump the Branches VPN Gateway routes:
+vpngws=$(az network vnet-gateway list -g $rg --query [].name -o tsv) 
+array=($vpngws)
+for vpngw in "${array[@]}"
+ do 
+ echo "*** $vpngw BGP peer status ***"
+ az network vnet-gateway list-bgp-peer-status -g $rg -n $vpngw -o table
+ echo "*** $vpngw BGP learned routes ***"
+ az network vnet-gateway list-learned-routes -g $rg -n $vpngw -o table
+ echo
+done

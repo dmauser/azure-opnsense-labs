@@ -1,0 +1,5 @@
+# Parameters
+rg="lab-vng-opn"
+
+# List all VMs and their private and public IPs
+az vm list-ip-addresses -g $rg --query "[].{Name:virtualMachine.name, PrivateIP:virtualMachine.network.privateIpAddresses[0], PublicIP:virtualMachine.network.publicIpAddresses[0].ipAddress}" -o table
