@@ -25,6 +25,6 @@ sleep 5
 echo "Waiting for VPN connection to be in provisioningState..."
 while [ $(az network vpn-connection show --name azure-to-$branchname-conn --resource-group $rg --query "provisioningState" -o tsv) != "Succeeded" ]
 do
-    echo "Waiting for VPN connection to be in provisioningState..."
+    echo "Waiting for VPN connection current status: $(az network vpn-connection show --name azure-to-$branchname-conn --resource-group $rg --query "provisioningState" -o tsv)"
     sleep 10
 done
