@@ -19,3 +19,14 @@ The lab consists of three main scripts to deploy the hub and spoke and also the 
 
 ## OPNSense configuration
 
+### Reviewing `config-OPNSense.xml`
+
+The `config-OPNSense.xml` file contains the exported configuration for the OPNSense firewall used in this lab. Key changes and settings include:
+
+- **Interfaces:** Configuration of WAN and LAN interfaces, as well as additional interfaces for VTI (Virtual Tunnel Interface) to support IPsec VPN tunnels.
+- **IPsec:** Definition of two IPsec phase 1 and phase 2 entries, each corresponding to a tunnel to the Azure VPN Gateway. These entries specify the peer IP addresses, authentication methods, encryption algorithms, and use of VTI mode.
+- **BGP (FRR):** BGP routing is enabled using the FRR plugin. The configuration includes the local ASN, BGP neighbor definitions (pointing to Azure BGP peers), and network advertisements for the branch subnet.
+- **Firewall Rules:** Rules are added to allow IPsec and BGP traffic on the relevant interfaces, ensuring connectivity between Azure and the branch.
+- **Loopback Interface:** A loopback interface is configured and used as the BGP router ID, which is a best practice for stable BGP sessions.
+
+You can review or import this file in the OPNSense web UI under System > Configuration > Backup & Restore to apply the lab settings.
