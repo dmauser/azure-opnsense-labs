@@ -1,25 +1,42 @@
 #!/bin/bash
 
-CONFIG_CONTENT="${1:-$CONFIG_CONTENT}"
-WG_INTERFACE="${2:-$WG_INTERFACE:-wg0}"
-WG_CONF="/etc/wireguard/${WG_INTERFACE}.conf"
-
-# WireGuard Client Configuration Script
-read -p "Enter WireGuard config content (end with CTRL+D): " CONFIG_CONTENT
-
 # Install WireGuard
 echo "[+] Installing WireGuard..."
 sudo apt update && sudo apt install -y wireguard
 sudo apt install -y resolvconf
 sudo apt install -y net-tools
 
-# Create WireGuard config file
-echo "[+] Creating WireGuard config at $WG_CONF..."
-sudo mkdir -p /etc/wireguard
-sudo bash -c "cat > $WG_CONF" <<EOF
-$CONFIG_CONTENT
-EOF
+OUTPUT_FILE="/etc/wireguard/wg0.conf"
 
-# Set permissions
-sudo chmod 600 "$WG_CONF"
+# Check if run as root
+if [[ $EUID -ne 0 ]]; then
+  echo "❌ This script must be run as root to write to /etc/wireguard/"
+  exit 1
+fi
 
+echo "Paste your WireGuard configuration below."
+echo "End your input with a line containing only: EOF"
+echo
+
+# Read multiline input
+CONFIG_CONTENT=""
+while IFS= read -r line; do
+  if [[ "$line" == "EOF" ]]; then
+    break
+  fi
+  CONFIG_CONTENT+="$line"$'\n'
+done
+
+# Write config to file
+echo -n "$CONFIG_CONTENT" > "$OUTPUT_FILE"
+sudo chmod 600 "$OUTPUT_FILE"
+
+echo "✅ WireGuard config saved to $OUTPUT_FILE"
+
+# Bring up interface
+echo "[+] Starting WireGuard interface..."
+sudo wg-quick up "$WG_INTERFACE"
+
+# Enable at boot
+echo "[+] Enabling $WG_INTERFACE to start on boot..."
+sudo systemctl enable "wg-quick@$WG_INTERFACE"
