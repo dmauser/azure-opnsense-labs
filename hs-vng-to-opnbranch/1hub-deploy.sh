@@ -26,20 +26,6 @@ done
 start_time=$(date +%s)
 echo "Script started at $(date)"
 
-# Check if the resource group exists
-echo "Checking if resource group '$rg' exists..."
-if [ "$(az group exists --name $rg)" = "true" ]; then
-    read -p "Resource group '$rg' already exists. Do you want to delete it? (y/n): " delete_rg
-    if [ "$delete_rg" = "y" ]; then
-        echo "Deleting resource group '$rg'..."
-        az group delete --name $rg --yes --no-wait
-        az group wait --name $rg --deleted
-    else
-        echo "Exiting script..."
-        exit 1
-    fi
-fi
-
 # Deploy Hub and Spoke
 echo "Deploying Hub and Spoke..."
 az group create --name $rg --location $location -o none
@@ -49,12 +35,6 @@ az deployment group create --name "Hub1-$location" --resource-group $rg \
     --parameters virtualMachineSize=$vmsize virtualMachinePublicIP=false deployBastion=true deployOnpremisesVPNGateway=false \
     --parameters VmAdminUsername=$username VmAdminPassword=$password \
     --no-wait
-
-# Check if the deployment command succeeded
-if [ $? -ne 0 ]; then
-    echo "Error deploying Hub and Spoke. Exiting script..."
-    exit 1
-fi
 
 # Monitor deployment status
 echo "Monitoring deployment status..."

@@ -176,7 +176,7 @@ fs1nvaip=$(az network nic show --name "$branchname-opnnva-Trusted-NIC" --resourc
   --query "ipConfigurations[0].privateIPAddress" -o tsv)
 az network route-table create -g $rg --name "$branchname-UDR" -l $location -o none
 az network route-table route create -g $rg --route-table-name "$branchname-UDR" --name "$branchname-UDR" \
-  --address-prefix "10.0.0.0/8" --next-hop-type VirtualAppliance --next-hop-ip-address $fs1nvaip -o none
+  --address-prefix "0.0.0.0/0" --next-hop-type VirtualAppliance --next-hop-ip-address $fs1nvaip -o none
 az network vnet subnet update -g $rg -n "vm-subnet" --vnet-name "$branchname-vnet" \
   --route-table "$branchname-UDR" -o none
 
