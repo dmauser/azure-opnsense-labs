@@ -1,8 +1,8 @@
 # Parameters
-rg="lab-vng-opn" # Define your resource group
+rg="lab-wg-nva" # Define your resource group
 location=$(az group show -n $rg --query location -o tsv) # Set location
 mypip=$(curl -4 ifconfig.io -s) # Captures your local Public IP for NSG rules
-branchname="branch1" 
+branchname="azwg
 
 # Deploy OPNsense NVA
 ShellScriptName="configureopnsense.sh"
