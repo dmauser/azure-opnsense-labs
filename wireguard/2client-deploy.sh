@@ -16,6 +16,7 @@ username=${username:-azureuser} # Default to azureuser if not provided
 read -p "Enter the number of virtual machines to create (default: 1): " vm_count
 vm_count=${vm_count:-1} # Default to 1 if not provided
 
+# Prompt for password
 while true; do
     read -s -p "Enter your password: " password
     echo

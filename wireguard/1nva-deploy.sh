@@ -1,8 +1,7 @@
 # Parameters
 rg="lab-wg-nva" # Define your resource group
 mypip=$(curl -4 ifconfig.io -s) # Captures your local Public IP for NSG rules
-branchname="azwg
-
+branchname="az-wg"
 # Prompt for location
 read -p "Enter the location (default: westus3): " location
 location=${location:-westus3} # Default to westus3 if not provided
@@ -11,6 +10,18 @@ location=${location:-westus3} # Default to westus3 if not provided
 read -p "Enter your username (default: azureuser): " username
 username=${username:-azureuser} # Default to azureuser if not provided
 
+# Prompt for password
+while true; do
+    read -s -p "Enter your password: " password
+    echo
+    read -s -p "Confirm your password: " password_confirm
+    echo
+    if [ "$password" = "$password_confirm" ]; then
+        break
+    else
+        echo "Passwords do not match. Please try again."
+    fi
+done
 
 # Deploy OPNsense NVA
 ShellScriptName="configureopnsense.sh"

@@ -1,5 +1,31 @@
 
+### Network Diagram
 
+
+
+### OPNsense Deployment
+
+OPNSense will be deployed by default on the Resource Group `lab-wg-nva`.
+
+```bash
+curl -sSL -o 1nva-deploy.sh https://raw.githubusercontent.com/dmauser/azure-opnsense-labs/main/wireguard/1nva-deploy.sh
+chmod +x 1nva-deploy.sh
+./1nva-deploy.sh
+```
+
+### WireGuard clients deployment
+
+WireGuard client configuration will be deployed by default on the Resource Group `lab-wg-client`.
+
+```bash
+curl -sSL -o 2client-deploy.sh https://raw.githubusercontent.com/dmauser/azure-opnsense-labs/main/wireguard/2client-deploy.sh
+chmod +x 2client-deploy.sh
+./2client-deploy.sh
+```
+
+### OPNsense WireGuard Configuration
+
+Note: add screenshots of the OPNsense WireGuard configuration here.
 
 ### Client configuration
 
