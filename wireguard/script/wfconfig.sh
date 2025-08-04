@@ -28,10 +28,15 @@ sudo chmod 600 "$OUTPUT_FILE"
 
 echo "✅ WireGuard config saved to $OUTPUT_FILE"
 
+# Set permissions
+sudo chmod 600 /etc/wireguard/wg0.conf
+
 # Bring up interface
 echo "[+] Starting WireGuard interface..."
-sudo wg-quick up "$WG_INTERFACE"
+sudo wg-quick up wg0
 
 # Enable at boot
-echo "[+] Enabling $WG_INTERFACE to start on boot..."
-sudo systemctl enable "wg-quick@$WG_INTERFACE"
+echo "[+] Enabling wg0 to start on boot..."
+sudo systemctl enable "wg-quick@wg0"
+
+echo "✅ WireGuard client setup complete!"
