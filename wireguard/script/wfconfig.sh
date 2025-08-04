@@ -5,6 +5,7 @@ echo "[+] Installing WireGuard..."
 sudo apt update && sudo apt install -y wireguard
 sudo apt install -y resolvconf
 sudo apt install -y net-tools
+clear
 
 OUTPUT_FILE="/etc/wireguard/wg0.conf"
 
