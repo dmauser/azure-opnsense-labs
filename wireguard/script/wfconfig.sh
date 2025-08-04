@@ -9,12 +9,6 @@ clear
 
 OUTPUT_FILE="/etc/wireguard/wg0.conf"
 
-# Check if run as root
-if [[ $EUID -ne 0 ]]; then
-  echo "❌ This script must be run as root to write to /etc/wireguard/"
-  exit 1
-fi
-
 echo "Paste your WireGuard configuration below."
 echo "End your input with a line containing only: EOF"
 echo
@@ -22,14 +16,14 @@ echo
 # Read multiline input
 CONFIG_CONTENT=""
 while IFS= read -r line; do
-  if [[ "$line" == "EOF" ]]; then
-    break
-  fi
-  CONFIG_CONTENT+="$line"$'\n'
+    if [[ "$line" == "EOF" ]]; then
+        break
+    fi
+    CONFIG_CONTENT+="$line"$'\n'
 done
 
-# Write config to file
-echo -n "$CONFIG_CONTENT" > "$OUTPUT_FILE"
+# Write config to file with sudo
+echo -n "$CONFIG_CONTENT" | sudo tee "$OUTPUT_FILE" > /dev/null
 sudo chmod 600 "$OUTPUT_FILE"
 
 echo "✅ WireGuard config saved to $OUTPUT_FILE"
