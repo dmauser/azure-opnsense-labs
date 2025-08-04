@@ -39,16 +39,13 @@ existingTrustedSubnetName="trusted"
 start_time=$(date +%s)
 echo "Script started at $(date)"
 
-# Wait for the resource group to exist
-while true; do
-  if [ "$(az group exists --name $rg)" = "true" ]; then
-    echo "Resource group $rg exists."
-    break
-  else
-    echo "Resource group $rg does not exist. Waiting for 15 seconds..."
-    sleep 15
-  fi
-done
+# Ensure the resource group exists, create if not
+if [ "$(az group exists --name $rg)" != "true" ]; then
+  echo "Resource group $rg does not exist. Creating..."
+  az group create --name $rg --location $location -o none
+else
+  echo "Resource group $rg exists."
+fi
 
 # Create NVA VNET and subnet
 az network vnet create --name "$branchname-vnet" --resource-group $rg --location $location \
