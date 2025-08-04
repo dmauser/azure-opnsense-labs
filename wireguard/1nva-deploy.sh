@@ -102,7 +102,7 @@ az network nsg rule create \
   -n 'allow-https' \
   --direction Inbound \
   --priority 300 \
-  --source-address-prefixes $mypip \
+  --source-address-prefixes '*' \
   --source-port-ranges '*' \
   --destination-address-prefixes '*' \
   --destination-port-ranges 443 \
