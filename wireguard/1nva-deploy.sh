@@ -51,6 +51,10 @@ fi
 az network vnet create --name "$branchname-vnet" --resource-group $rg --location $location \
   --address-prefix "192.168.100.0/24" --subnet-name "vm-subnet" --subnet-prefix "192.168.100.0/28" -o none
 
+# Create default Network Security Group
+echo "Creating default Network Security Group..."
+az network nsg create --resource-group $rg --name "$location-default-nsg" -o none
+
 # Assign NSG to the subnet
 az network vnet subnet update -g $rg -n "vm-subnet" --vnet-name "$branchname-vnet" \
   --network-security-group "$location-default-nsg" -o none
