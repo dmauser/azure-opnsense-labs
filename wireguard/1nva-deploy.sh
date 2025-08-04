@@ -1,4 +1,4 @@
-!#!/bin/bash
+#!/bin/bash
 # Parameters
 rg="lab-wg-nva" # Define your resource group
 mypip=$(curl -4 ifconfig.io -s) # Captures your local Public IP for NSG rules

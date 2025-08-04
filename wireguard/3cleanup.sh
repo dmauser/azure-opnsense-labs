@@ -1,4 +1,4 @@
-!#!/bin/bash
+#!/bin/bash
 nvarg="lab-wg-nva" # Define your resource group
 clientrg="lab-wg-client" # Define your client resource group
 

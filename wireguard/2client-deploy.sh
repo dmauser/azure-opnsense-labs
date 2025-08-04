@@ -1,5 +1,4 @@
-!#!/bin/bash
-
+#!/bin/bash
 # Parameters
 rg="lab-wg-client"
 vmsize="Standard_B1s" # Specify the VM size you want to use
