@@ -29,12 +29,12 @@ while true; do
     fi
 done
 
-# Check if resource group exists
-if az group show --name $rg --query "name" --output tsv 2>/dev/null; then
-  echo "Resource group $rg already exists. Skipping creation..."
-else
-  echo "Creating resource group $rg in location $location..."
+# Ensure the resource group exists, create if not
+if [ "$(az group exists --name $rg)" != "true" ]; then
+  echo "Resource group $rg does not exist. Creating..."
   az group create --name $rg --location $location -o none
+else
+  echo "Resource group $rg exists."
 fi
 
 # Create Virutual Network and Subnet
