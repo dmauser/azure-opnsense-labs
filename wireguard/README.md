@@ -1,7 +1,13 @@
 
+# LAB: WireGuard VPN with OPNsense in Azure
+
+## Overview
+
+This lab demonstrates how to deploy OPNsense as a Network Virtual Appliance (NVA) in Azure, configure it with WireGuard VPN, and set up client configurations for secure remote access.
+
 ### Network Diagram
 
-
+![Network Diagram](./diagram.png)
 
 ### OPNsense Deployment
 
