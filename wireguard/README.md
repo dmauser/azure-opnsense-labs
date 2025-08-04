@@ -40,3 +40,14 @@ curl -sSL -o wfconfig.sh https://raw.githubusercontent.com/dmauser/azure-opnsens
 chmod +x wfconfig.sh
 ./wfconfig.sh
 ```
+
+### Cleanup
+
+To clean up the resources created during this lab, run the following commands:
+
+```bash
+curl -sSL -o cleanup.sh https://raw.githubusercontent.com/dmauser/azure-opnsense-labs/main/wireguard/3cleanup.sh
+chmod +x cleanup.sh
+./cleanup.sh
+```
+
