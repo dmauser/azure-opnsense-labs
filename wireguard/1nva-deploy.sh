@@ -114,6 +114,21 @@ az network nsg rule create \
 az network nsg rule create \
   -g $rg \
   --nsg-name $branchname-nva-nsg \
+  -n 'allow-WGInbound' \
+  --direction Inbound \
+  --priority 301 \
+  --source-address-prefixes '*' \
+  --source-port-ranges '*' \
+  --destination-address-prefixes '*' \
+  --destination-port-ranges 51820 \
+  --access Allow \
+  --protocol Udp \
+  --description "WireGuard inbound" \
+  --output none
+
+az network nsg rule create \
+  -g $rg \
+  --nsg-name $branchname-nva-nsg \
   -n 'allow-rfc1918-in' \
   --direction Inbound \
   --priority 310 \
