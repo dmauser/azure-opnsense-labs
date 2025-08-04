@@ -214,7 +214,22 @@ done
 
 # Enable boot diagnostics for all VMs
 echo "Enabling boot diagnostics for all VMs"
-az vm boot-diagnostics enable --ids $(az vm list -g $rg --query "[?contains(name, '$branchname')].id" -o tsv) -o none
+az vm boot-diagnostics enable --ids $(az vm list -g $rg --query "[?contains(name, '$branchname')].id" -o tsv) -o none &>/dev/null &
+
+# Loop script to monitor az-wg-opnnva-TwoNics deployment status
+echo "Monitoring deployment status..."  
+while true; do
+    status=$(az deployment group show --name "$branchname-opnnva-TwoNics" --resource-group $rg --query properties.provisioningState -o tsv)
+    echo "Deployment status: $status"
+    if [ "$status" = "Succeeded" ]; then
+        echo "Deployment succeeded."
+        break
+    elif [ "$status" = "Failed" ]; then
+        echo "Deployment failed."
+        exit 1
+    fi
+    sleep 15 # Wait for 15 seconds before checking again
+done
 
 echo "Deployment has finished."
 
