@@ -90,7 +90,6 @@ chmod +x 2client-deploy.sh
 - **⚠️ Important** Make sure to copy the Config content (in yellow below) to Notepad before clicking in **Store and generated next** and **Apply** to commit the changes.
 ![VPN:WireGuard:Peer Generator](./media/vpn-wireguard-peer-generator.png)
 
-
 ### Client configuration
 
 1. Open WireGuard client using serial console.
