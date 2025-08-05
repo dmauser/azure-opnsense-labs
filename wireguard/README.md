@@ -7,7 +7,7 @@ This lab demonstrates how to deploy OPNsense as a Network Virtual Appliance (NVA
 
 ### Network Diagram
 
-![Network Diagram](./diagram.png)
+![Network Diagram](./media/diagram.png)
 
 ### OPNsense Deployment
 
