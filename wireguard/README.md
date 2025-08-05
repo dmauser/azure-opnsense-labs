@@ -83,11 +83,11 @@ chmod +x 2client-deploy.sh
 5. Generate WireGuard client configuration
 
 - VPN:WireGuard:Peer Generator: Configure the Peer Generator with the following settings:
-  - Endpoint: <opnsense-public-ip>:51820
+  - Endpoint: **"opnsense-public-ip:51820"**
   - Name: wgclient-vm1
   - DNS Server: 8.8.8.8
 
-- Make sure to copy the Config content to notepad before clicking in **Store and generated next** and **Apply** to commit the changes.
+- **⚠️ Important** Make sure to copy the Config content (in yellow below) to Notepad before clicking in **Store and generated next** and **Apply** to commit the changes.
 ![VPN:WireGuard:Peer Generator](./media/vpn-wireguard-peer-generator.png)
 
 
