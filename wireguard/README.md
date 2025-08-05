@@ -119,7 +119,7 @@ ping 192.169.100.4 -c 5 # That is the az-wg-vm1 client which on the OPNSense sid
 sudo wg show # It displays the WireGuard interface and connection status
 ```
 
-Here is an example of the output you should see:
+- Here is an example of the output you should see:
 ![WireGuard Client Connection Validation](./media/wg-client-validation.png)
 
 2. On the OPNsense side, you can check the WireGuard status by navigating to: **VPN:WireGuard:Status** as shown below:
