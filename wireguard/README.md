@@ -57,33 +57,32 @@ chmod +x 2client-deploy.sh
 
 - Interfaces:WireGuard
 
-- Enable Interface and Prevent interface removal and click on save.
+    - Enable Interface and Prevent interface removal and click on save.
 ![Interfaces:WireGuard](./media/interfaces-wireguard.png)
 
 4. Make adjustments on the Firewall rules
 
-Firewall:Rules:WireGuard
+- Firewall:Rules:WireGuard
 
-- Add a rule to allow all traffic to the WireGuard interface.
+    - Add a rule to allow all traffic to the WireGuard interface.
 ![Firewall:Rules:WireGuard](./media/firewall-rules-wireguard.png)
 
-Firewall:Rules:LAN
+- Firewall:Rules:LAN
 
-- Edit LAN rule (Default allow LAN to any Rule) and change the source from LAN net to any. Review the rule and click in apply to commit the changes.
+    - Edit LAN rule (Default allow LAN to any Rule) and change the source from LAN net to any. Review the rule and click in apply to commit the changes.
 ![Firewall:Rules:LAN](./media/firewall-rules-lan.png)
 ![Firewall:Rules:LAN](./media/firewall-rules-lan2.png)
 
-Firewall:Rules:WAN
+- Firewall:Rules:WAN
 
-- Add rule to allow UDP port 51820 which is the default WireGuard port.
+    - Add rule to allow UDP port 51820 which is the default WireGuard port.
 ![Firewall:Rules:WAN](./media/firewall-rules-wan.png)
-- Review the rule and click in apply to commit the changes.
+    - Review the rule and click in apply to commit the changes.
 ![Firewall:Rules:WAN](./media/firewall-rules-wan2.png)
 
 5. Generate WireGuard client configuration
 
-VPN:WireGuard:Peer Generator
-- Configure the Peer Generator with the following settings:
+- VPN:WireGuard:Peer Generator: Configure the Peer Generator with the following settings:
   - Endpoint: <opnsense-public-ip>:51820
   - Name: wgclient-vm1
   - DNS Server: 8.8.8.8
@@ -136,4 +135,3 @@ curl -sSL -o cleanup.sh https://raw.githubusercontent.com/dmauser/azure-opnsense
 chmod +x cleanup.sh
 ./cleanup.sh
 ```
-
