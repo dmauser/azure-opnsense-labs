@@ -33,9 +33,7 @@ chmod +x 2client-deploy.sh
 
 1. Configure Static Routes
 
-System:Routes:Configuration
-
-Add RFC 1918 routes ensure they use LAN_GW as next hop as shown:
+- System:Routes:Configuration: add RFC 1918 routes ensure they use LAN_GW as next hop as shown:
 
 ![System:Routes:Configuration](./media/system-routes-configuration.png)
 
@@ -43,21 +41,21 @@ Add RFC 1918 routes ensure they use LAN_GW as next hop as shown:
 
 2. Configure WireGuard
 
-VPN:WireGuard:Configuration
+- VPN:WireGuard:Configuration: Ensure to populated Name, Listen Port, Tunnel address, and Generate a new keypair as shown:
 
 ![VPN:WireGuard:Configuration](./media/vpn-wireguard-configuration.png)
 
 3. Assign and configure WireGuard Interface
 
-Interfaces:Assignments
+- Interfaces:Assignments
 
-- Add WireGuard as description and click in add button.
+    - Add WireGuard as description and click in add button.
 ![Interfaces:Assignments](./media/interfaces-assignments.png)
 
-- Click on save to commit the changes.
+    - Click on save to commit the changes.
 ![Interfaces:Assignments](./media/interfaces-assignments2.png)
 
-Interfaces:WireGuard
+- Interfaces:WireGuard
 
 - Enable Interface and Prevent interface removal and click on save.
 ![Interfaces:WireGuard](./media/interfaces-wireguard.png)
