@@ -31,7 +31,29 @@ chmod +x 2client-deploy.sh
 
 ### OPNsense WireGuard Configuration
 
-Note: add screenshots of the OPNsense WireGuard configuration here.
+1. Configure Static Routes
+
+System:Routes:Configuration
+
+Add RFC 1918 routes ensure they use LAN_GW as next hop as shown:
+
+![System:Routes:Configuration](./media/system-routes-configuration.png)
+
+> ⚡ **Make sure to click "Apply" to commit the changes.**
+
+2. Configure WireGuard
+
+VPN:WireGuard:Configuration
+
+![VPN:WireGuard:Configuration](./media/vpn-wireguard-configuration.png)
+
+3. Assign WireGuard Interface
+
+Interfaces:Assignments
+
+
+
+![Interfaces:Assignments](./media/interfaces-assignments.png)
 
 ### Client configuration
 
