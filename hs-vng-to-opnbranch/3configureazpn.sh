@@ -4,6 +4,22 @@ branchname="branch1"
 branchasn="65100"
 sharedkey="abc123"
 
+# Monitor deployment status
+echo "Monitoring deployment status..."
+while true; do
+    status=$(az deployment group show --name "Hub1-$location" --resource-group $rg --query properties.provisioningState -o tsv)
+    echo "Deployment status: $status"
+    if [ "$status" = "Succeeded" ]; then
+        echo "Deployment succeeded."
+        break
+    elif [ "$status" = "Failed" ]; then
+        echo "Deployment failed."
+        exit 1
+    fi
+    sleep 15 # Wait for 15 seconds before checking again
+done
+echo "Deployment has finished."
+
 # Create $branchname local network gateway
 nvapip=$(az network public-ip show -g $rg --name branch1-opnnva-PublicIP --query ipAddress -o tsv)
 az network local-gateway create --name $branchname-lgw \
