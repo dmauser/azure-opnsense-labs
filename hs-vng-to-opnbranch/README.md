@@ -1,9 +1,9 @@
-# Lab: Active/Active Azure VPN Gateway S2S VPN with BGP and OPNSense
+# Lab: Active/Active Azure VPN Gateway S2S VPN with BGP and OPNsense
 
 
-This lab demonstrates how to set up a hub-and-spoke network topology using Azure Virtual Network Gateway (VNG) VPN and OPNSense firewall as a branch device.
+This lab demonstrates how to set up a hub-and-spoke network topology using Azure Virtual Network Gateway (VNG) VPN and OPNsense firewall as a branch device.
 
-This lab uses Active/Active VPN Gateway using two IPsec tunnels to connect the Azure hub network with a branch network that uses OPNSense as a firewall appliance. In this lab we use VTI and a loopback interface on the OPNSense to instance the BGP. 
+This lab uses Active/Active VPN Gateway using two IPsec tunnels to connect the Azure hub network with a branch network that uses OPNsense as a firewall appliance. In this lab we use VTI and a loopback interface on OPNsense to establish BGP sessions.
 
 ## Network Topology
 
@@ -11,13 +11,13 @@ This lab uses Active/Active VPN Gateway using two IPsec tunnels to connect the A
 
 The lab consists of three main scripts to deploy the hub and spoke and also the branch network with OPNSense:
 
-1. **`1hub-deploy.sh`**: Deploys Azure resources for the hub network, including VNet, subnets, and Virtual Network Gateway (VNG). There are a Linux VM on each vNet (Hub, Spoke1, and Spoke2).
+1. **`1hub-deploy.sh`**: Deploys Azure resources for the hub network, including VNet, subnets, and Virtual Network Gateway (VNG). There is a Linux VM on each VNet (Hub, Spoke1, and Spoke2).
 
-2. **`2branch-deploy.sh`**: Deploys Azure resources for the branch network, including the VNet, subnets, and an OPNSense firewall appliance.
+2. **`2branch-deploy.sh`**: Deploys Azure resources for the branch network, including the VNet, subnets, and an OPNsense firewall appliance.
 
-3. **`3configurevpn.sh`**: Configures the VPN connection between the Azure VNG in the hub and the OPNSense firewall in the branch.
+3. **`3configureazpn.sh`**: Configures the VPN connection between the Azure VNG in the hub and the OPNsense firewall in the branch.
 
-## OPNSense configuration
+## OPNsense configuration
 
 ### Reviewing `config-OPNSense.xml`
 
@@ -29,4 +29,4 @@ The `config-OPNSense.xml` file contains the exported configuration for the OPNSe
 - **Firewall Rules:** Rules are added to allow IPsec and BGP traffic on the relevant interfaces, ensuring connectivity between Azure and the branch.
 - **Loopback Interface:** A loopback interface is configured and used as the BGP router ID, which is a best practice for stable BGP sessions.
 
-You can review or import this file in the OPNSense web UI under System > Configuration > Backup & Restore to apply the lab settings.
+You can review or import this file in the OPNsense web UI under System > Configuration > Backup & Restore to apply the lab settings.
