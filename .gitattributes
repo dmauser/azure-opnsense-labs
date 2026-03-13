@@ -1,0 +1,5 @@
+# Always use LF for shell scripts to avoid CRLF issues on Linux/WSL
+*.sh text eol=lf
+
+# Default: normalize line endings on checkout for other text files
+* text=auto
